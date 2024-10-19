@@ -8,7 +8,7 @@
 import SwiftUI
 
 public struct MainframeToggleStyle: ToggleStyle {
-    private let toggleWidth: CGFloat = 250
+    private let toggleWidth: CGFloat = 48
     
     private let thumbScaleFactor: CGFloat = 0.9
     private let innerShadowRadius: CGFloat = 3
@@ -34,9 +34,10 @@ public struct MainframeToggleStyle: ToggleStyle {
         toggleWidth / 8
     }
     
-    private let thumbColor = Color(red: 0.82, green: 0.85, blue: 0.79)
+    private let thumbColor: Color = Color(red: 0.82, green: 0.85, blue: 0.79)
     private let onColor: Color = .green
     private let offColor: Color = .gray
+    private let thumbLightColor: Color = Color(red: 0.67, green: 0.96, blue: 0.72)
     
     public func makeBody(configuration: Configuration) -> some View {
         LabeledContent {
@@ -128,8 +129,8 @@ public struct MainframeToggleStyle: ToggleStyle {
         [
             .white,
             .white,
-            .green.opacity(isOn ? 1.0 : 0.0),
-            .green.opacity(isOn ? 1.0: 0.0),
+            Color(red: 0.67, green: 0.96, blue: 0.72).opacity(isOn ? 1.0 : 0.0),
+            Color(red: 0.67, green: 0.96, blue: 0.72).opacity(isOn ? 0.4: 0.0),
             .clear.opacity(isOn ? 1.0 : 0.0)
         ]
     }
