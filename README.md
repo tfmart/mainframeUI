@@ -1,7 +1,8 @@
 # mainframeUI
 
-A sleek button and toggle style for SwiftUI. Inspired by designs shared by Jordan Singer (@jsngr) for Mainframe.
 ![Demonstration of the button and toggle style included in this package](hero.png)
+
+A sleek button and toggle style for SwiftUI. Inspired by designs shared by Jordan Singer (@jsngr) for Mainframe.
 
 # Usage
 ```swift
