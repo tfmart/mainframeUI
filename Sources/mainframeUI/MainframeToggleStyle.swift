@@ -10,6 +10,8 @@ import SwiftUI
 public struct MainframeToggleStyle: ToggleStyle {
     private let toggleWidth: CGFloat = 48
     
+    @State private var dragOffset: CGFloat = 0
+    
     private let thumbScaleFactor: CGFloat = 0.9
     private let innerShadowRadius: CGFloat = 3
     private let innerShadowYOffset: CGFloat = 2
@@ -34,6 +36,8 @@ public struct MainframeToggleStyle: ToggleStyle {
         toggleWidth / 8
     }
     
+    private let toggleAnimation: Animation = .easeOut(duration: 0.2)
+    
     private let thumbColor: Color = Color(red: 0.82, green: 0.85, blue: 0.79)
     private let onColor: Color = .green
     private let offColor: Color = .gray
@@ -42,48 +46,57 @@ public struct MainframeToggleStyle: ToggleStyle {
     public func makeBody(configuration: Configuration) -> some View {
         LabeledContent {
             GeometryReader { geometry in
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(thumbColor
-                        .shadow(.inner(color: .black.opacity(0.4), radius: innerShadowRadius, y: -innerShadowYOffset))
-                        .shadow(.inner(color: .white.opacity(0.6), radius: innerShadowRadius, y: innerShadowYOffset)),
-                            lineWidth: borderWidth)
-                    .fill(configuration.isOn ? onColor.gradient : offColor.gradient)
-                    .rotationEffect(.degrees(180))
-                    .frame(width: toggleWidth, height: toggleHeight)
-                    .overlay {
-                        thumb(configuration.isOn)
-                            .foregroundStyle(thumbColor.gradient)
-                            .frame(width: thumbSize, height: thumbSize)
-                            .offset(x: configuration.isOn ? thumbOffset : -thumbOffset)
-                            .compositingGroup()
-                            .shadow(radius: 8)
-                            .gesture(
-                                DragGesture(minimumDistance: 0)
-                                    .onEnded { value in
-                                        let threshold = geometry.size.width / 2
-                                        withAnimation {
-                                            if value.translation.width > threshold {
-                                                configuration.isOn = true
-                                            } else if value.translation.width < -threshold {
-                                                configuration.isOn = false
-                                            } else {
-                                                configuration.isOn.toggle()
-                                            }
-                                        }
-                                    }
-                            )
-                    }
-                    .animation(.easeOut, value: configuration.isOn)
-                    .onTapGesture {
-                        withAnimation {
-                            configuration.isOn.toggle()
+                ZStack {
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(thumbColor
+                            .shadow(.inner(color: .black.opacity(0.4), radius: innerShadowRadius, y: -innerShadowYOffset))
+                            .shadow(.inner(color: .white.opacity(0.6), radius: innerShadowRadius, y: innerShadowYOffset)),
+                                lineWidth: borderWidth)
+                        .fill(configuration.isOn ? onColor.gradient : offColor.gradient)
+                        .rotationEffect(.degrees(180))
+                        .animation(toggleAnimation, value: configuration.isOn)
+                    
+                    thumb(configuration.isOn)
+                        .foregroundStyle(thumbColor.gradient)
+                        .frame(width: thumbSize, height: thumbSize)
+                        .offset(x: xOffset(for: configuration.isOn, in: geometry))
+                        .compositingGroup()
+                        .shadow(radius: 8)
+                }
+                .frame(width: toggleWidth, height: toggleHeight)
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            dragOffset = value.translation.width
                         }
-                    }
+                        .onEnded { value in
+                            let dragThreshold = geometry.size.width / 4
+                            let newState = dragOffset > dragThreshold || (configuration.isOn && dragOffset > -dragThreshold)
+                            withAnimation(toggleAnimation) {
+                                configuration.isOn = newState
+                                dragOffset = 0
+                            }
+                        }
+                )
+                .simultaneousGesture(
+                    TapGesture()
+                        .onEnded {
+                            withAnimation(toggleAnimation) {
+                                configuration.isOn.toggle()
+                            }
+                        }
+                )
             }
             .frame(width: toggleWidth, height: toggleHeight)
         } label: {
             configuration.label
         }
+    }
+    
+    private func xOffset(for isOn: Bool, in geometry: GeometryProxy) -> CGFloat {
+        let baseOffset = isOn ? thumbOffset : -thumbOffset
+        let dragLimit = geometry.size.width / 2 - thumbSize / 2
+        return min(max(baseOffset + dragOffset, -dragLimit), dragLimit)
     }
     
     func thumb(_ isOn: Bool) -> some View {
