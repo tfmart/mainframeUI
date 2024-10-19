@@ -8,26 +8,54 @@
 import SwiftUI
 
 public struct MainframeToggleStyle: ToggleStyle {
-    var thumbColor: Color {
-        Color(red: 0.82, green: 0.85, blue: 0.79)
+    private let toggleWidth: CGFloat = 250
+    
+    private let thumbScaleFactor: CGFloat = 0.9
+    private let innerShadowRadius: CGFloat = 3
+    private let innerShadowYOffset: CGFloat = 2
+    
+    private var toggleHeight: CGFloat {
+        toggleWidth / 1.5
     }
+    
+    private var cornerRadius: CGFloat {
+        toggleWidth / 1.75
+    }
+    
+    private var thumbSize: CGFloat {
+        toggleWidth / 1.5
+    }
+    
+    private var thumbOffset: CGFloat {
+        toggleWidth / 5.6
+    }
+    
+    private var borderWidth: CGFloat {
+        toggleWidth / 8
+    }
+    
+    private let thumbColor = Color(red: 0.82, green: 0.85, blue: 0.79)
+    private let onColor: Color = .green
+    private let offColor: Color = .gray
     
     public func makeBody(configuration: Configuration) -> some View {
         LabeledContent {
             GeometryReader { geometry in
-                RoundedRectangle(cornerRadius: 32)
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(thumbColor
-                        .shadow(.inner(color: .black.opacity(0.4), radius: 3, y: -2))
-                        .shadow(.inner(color: .white.opacity(0.6), radius: 3, y: 2)),
-                            lineWidth: 6)
-                    .fill(configuration.isOn ? Color.green.gradient : Color.gray.gradient)
+                        .shadow(.inner(color: .black.opacity(0.4), radius: innerShadowRadius, y: -innerShadowYOffset))
+                        .shadow(.inner(color: .white.opacity(0.6), radius: innerShadowRadius, y: innerShadowYOffset)),
+                            lineWidth: borderWidth)
+                    .fill(configuration.isOn ? onColor.gradient : offColor.gradient)
                     .rotationEffect(.degrees(180))
-                    .frame(width: 56, height: 36)
+                    .frame(width: toggleWidth, height: toggleHeight)
                     .overlay {
                         thumb(configuration.isOn)
                             .foregroundStyle(thumbColor.gradient)
-                            .frame(width: 36, height: 36)
-                            .offset(x: configuration.isOn ? 10 : -10)
+                            .frame(width: thumbSize, height: thumbSize)
+                            .offset(x: configuration.isOn ? thumbOffset : -thumbOffset)
+                            .compositingGroup()
+                            .shadow(radius: 8)
                             .gesture(
                                 DragGesture(minimumDistance: 0)
                                     .onEnded { value in
@@ -44,14 +72,14 @@ public struct MainframeToggleStyle: ToggleStyle {
                                     }
                             )
                     }
-                    .animation(.bouncy, value: configuration.isOn)
+                    .animation(.easeOut, value: configuration.isOn)
                     .onTapGesture {
                         withAnimation {
                             configuration.isOn.toggle()
                         }
                     }
             }
-            .frame(width: 56, height: 36)
+            .frame(width: toggleWidth, height: toggleHeight)
         } label: {
             configuration.label
         }
@@ -60,10 +88,11 @@ public struct MainframeToggleStyle: ToggleStyle {
     func thumb(_ isOn: Bool) -> some View {
         ZStack {
             Circle()
+                .fill(thumbColor.gradient)
                 .fill(LinearGradient(colors: [
-                    Color.white,
-                    Color.gray,
-                    Color.white
+                    Color.white.opacity(0.6),
+                    Color.gray.opacity(0.4),
+                    Color.white.opacity(0.8)
                 ],
                                      startPoint: .top,
                                      endPoint: .bottom))
@@ -74,10 +103,12 @@ public struct MainframeToggleStyle: ToggleStyle {
                                        startPoint: .top,
                                        endPoint: .bottom), lineWidth: 1, antialiased: true)
             Circle()
+                .fill(thumbColor.gradient)
+                .rotationEffect(.degrees(180))
                 .overlay {
                     toggleLight(isOn)
                 }
-                .scaleEffect(0.85)
+                .scaleEffect(thumbScaleFactor)
         }
     }
     
@@ -87,21 +118,20 @@ public struct MainframeToggleStyle: ToggleStyle {
             .fill(RadialGradient(gradient: Gradient(colors: thumbLightColor(isOn)),
                                  center: .center,
                                  startRadius: 0,
-                                 endRadius: 4))
-            .frame(width: 8, height: 8)
-            .animation(.smooth, value: isOn)
+                                 endRadius: toggleWidth / 4))
+            .opacity(isOn ? 1.0 : 0.0)
+            .scaleEffect(isOn ? 0.4: 0.3)
+            .animation(.easeOut.delay(0.15), value: isOn)
     }
     
     func thumbLightColor(_ isOn: Bool) -> [Color] {
-        if isOn {
-            [
-                .white, .white, .green, .green.opacity(0.2)
-            ]
-        } else {
-            [
-                .gray, .green.opacity(0.0), .green.opacity(0.0)
-            ]
-        }
+        [
+            .white,
+            .white,
+            .green.opacity(isOn ? 1.0 : 0.0),
+            .green.opacity(isOn ? 1.0: 0.0),
+            .clear.opacity(isOn ? 1.0 : 0.0)
+        ]
     }
 }
 
@@ -116,15 +146,11 @@ extension ToggleStyle where Self == MainframeToggleStyle {
     ZStack {
         Color(red: 0.91, green: 0.92, blue: 0.89)
             .ignoresSafeArea()
-        VStack {
-            Toggle(isOn: $value) {
-                Text("Toggle")
-            }
-            .toggleStyle(.mainframe)
-            
-            Toggle(isOn: $value) {
-                Text("Toggle")
-            }
-        }.padding()
-    }.labelsHidden()
+        Toggle(isOn: $value) {
+            Text("Toggle")
+        }
+        .toggleStyle(.mainframe)
+        .padding()
+        .labelsHidden()
+    }
 }

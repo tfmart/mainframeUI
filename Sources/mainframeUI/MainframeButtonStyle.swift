@@ -8,83 +8,77 @@
 import SwiftUI
 
 public struct MainframeButtonStyle: ButtonStyle {
+    private let borderWidth: CGFloat = 4
+    private let pressedScale: CGFloat = 0.96
+    private let shadowRadius: CGFloat = 1
+    private let shadowYOffset: CGFloat = 2
+    private let pressedOpacity: CGFloat = 0.1
+    private let animationDuration: CGFloat = 0.2
+    private let innerCapsuleScaleEffect: CGFloat = 0.92
+    
+    private let borderGradientColors: [Color] = [
+        .white.opacity(0.8),
+        .black.opacity(0.4),
+        .white.opacity(0.5)
+    ]
+    
+    private let shadowBorderColors: [Color] = [
+        .black,
+        .black.opacity(0.8),
+        .black.opacity(0.1)
+    ]
+    
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundStyle(labelForegroundStyle)
+            .foregroundStyle(.white)
             .fontWeight(.semibold)
             .padding()
             .background(
-                Capsule()
-                    .fill(.foreground)
-                    .stroke(
-                        LinearGradient(
-                            colors: borderGradientColors(configuration.isPressed),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ),
-                        lineWidth: 4
-                    )
-                    .padding(2)
+                ZStack {
+                    Capsule()
+                        .fill(.foreground)
+                        .fill(borderGradient)
+                    Capsule()
+                        .fill(.foreground)
+                        .scaleEffect(innerCapsuleScaleEffect)
+                }
             )
             .overlay {
                 shadowBorder(configuration.isPressed)
             }
             .compositingGroup()
-            .shadow(color: .black.opacity(configuration.isPressed ? 0.0 : 0.5), radius:  1, y: 2)
+            .shadow(
+                color: .black.opacity(configuration.isPressed ? 0.0 : 0.5),
+                radius: shadowRadius,
+                y: shadowYOffset
+            )
             .overlay {
                 if configuration.isPressed {
-                    Capsule().fill(.black).opacity(0.1)
+                    Capsule().fill(.black).opacity(pressedOpacity)
                 }
             }
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .animation(pressedDownAnimation,
-                       value: configuration.isPressed)
-        
+            .scaleEffect(configuration.isPressed ? pressedScale : 1.0)
+            .animation(.smooth(duration: animationDuration), value: configuration.isPressed)
     }
     
-    var labelForegroundStyle: some ShapeStyle {
-        Color.white
-            .gradient
-            .shadow(
-                .drop(
-                    color: .black.opacity(0.4),
-                    radius: 0,
-                    y: -1
-                )
-            )
+    private var borderGradient: LinearGradient {
+        LinearGradient(
+            colors: borderGradientColors,
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
     
-    func shadowBorder(_ isPressed: Bool) -> some View {
+    private func shadowBorder(_ isPressed: Bool) -> some View {
         Capsule()
-            .stroke(LinearGradient(
-                colors: [
-                    .black,
-                    .black.opacity(0.8),
-                    .black.opacity(0.1)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            ), lineWidth: isPressed ? 2 : 1)
-    }
-    
-    var pressedDownAnimation: Animation {
-        .smooth(duration: 0.2)
-    }
-    
-    func borderGradientColors(_ isPressed: Bool) -> [Color] {
-        if isPressed {
-            [
-                .black.opacity(0.2),
-                .black.opacity(0.8),
-                .black.opacity(0.1)
-            ]
-        } else {
-            [
-                .white.opacity(0.8),
-                .black.opacity(0.4),
-                .white.opacity(0.5)
-            ]
-        }
+            .stroke(
+                LinearGradient(
+                    colors: shadowBorderColors,
+                    startPoint: .top,
+                    endPoint: .bottom
+                ),
+                lineWidth: isPressed ? 2 : 1
+            )
     }
 }
 
