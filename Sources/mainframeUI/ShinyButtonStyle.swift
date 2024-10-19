@@ -1,19 +1,16 @@
+//
+//  ShinyButtonStyle.swift
+//  mainframeUI
+//
+//  Created by Tomas Martins on 19/10/24.
+//
+
 import SwiftUI
 
 public struct ShinyButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundStyle(
-                .white
-                    .gradient
-                    .shadow(
-                        .drop(
-                            color: .black.opacity(0.4),
-                            radius: 0,
-                            y: configuration.isPressed ? 0 : -1
-                        )
-                    )
-            )
+            .foregroundStyle(labelForegroundStyle)
             .fontWeight(.semibold)
             .padding()
             .background(
@@ -24,13 +21,7 @@ public struct ShinyButtonStyle: ButtonStyle {
                         .fill(.foreground)
                         .stroke(
                             LinearGradient(
-                                colors: [
-                                    .white.opacity(0.6),
-                                    .white.opacity(0.2),
-                                    .black.opacity(0.6),
-                                    .white.opacity(0.2),
-                                    .white.opacity(0.4)
-                                ],
+                                colors: borderGradientColors(configuration.isPressed),
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
@@ -40,16 +31,7 @@ public struct ShinyButtonStyle: ButtonStyle {
                 }
             )
             .overlay {
-                Capsule()
-                    .stroke(LinearGradient(
-                        colors: [
-                            .black,
-                            .black.opacity(0.8),
-                            .black.opacity(0.1)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ), lineWidth: configuration.isPressed ? 2.5 : 1)
+                shadowBorder(configuration.isPressed)
             }
             .compositingGroup()
             .shadow(color: .black.opacity(configuration.isPressed ? 0.0 : 0.5), radius:  1, y: 2)
@@ -59,8 +41,54 @@ public struct ShinyButtonStyle: ButtonStyle {
                 }
             }
             .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .animation(.smooth(duration: 0.2), value: configuration.isPressed)
+            .animation(pressedDownAnimation,
+                       value: configuration.isPressed)
         
+    }
+    
+    var labelForegroundStyle: some ShapeStyle {
+        Color.white
+            .gradient
+            .shadow(
+                .drop(
+                    color: .black.opacity(0.4),
+                    radius: 0,
+                    y: -1
+                )
+            )
+    }
+    
+    func shadowBorder(_ isPressed: Bool) -> some View {
+        Capsule()
+            .stroke(LinearGradient(
+                colors: [
+                    .black,
+                    .black.opacity(0.8),
+                    .black.opacity(0.1)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            ), lineWidth: isPressed ? 2 : 1)
+    }
+    
+    var pressedDownAnimation: Animation {
+        .smooth(duration: 0.2)
+    }
+    
+    func borderGradientColors(_ isPressed: Bool) -> [Color] {
+        if isPressed {
+            [
+                .black.opacity(0.2),
+                .black.opacity(0.8),
+                .black.opacity(0.1)
+            ]
+        } else {
+            [
+                .white.opacity(0.8),
+                .black.opacity(0.4),
+                .white.opacity(0.5)
+            ]
+        }
     }
 }
 
@@ -72,13 +100,15 @@ extension ButtonStyle where Self == ShinyButtonStyle {
 
 #Preview {
     ZStack {
-        Color(red: 0.91, green: 0.89, blue: 0.87)
+        Color(red: 0.92, green: 0.92, blue: 0.92)
             .ignoresSafeArea()
-        Button("\(Image(systemName: "sun.min.fill"))") {
+        Button {
             
+        } label: {
+            Text("Generate")
+                .padding(.horizontal)
         }
-        .font(.largeTitle)
         .buttonStyle(.shiny)
-        .foregroundStyle(.brown.gradient)
+        .foregroundStyle(.gray.gradient)
     }
 }
