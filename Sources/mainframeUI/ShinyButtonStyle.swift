@@ -1,10 +1,3 @@
-//
-//  SwiftUIView.swift
-//  mainframeUI
-//
-//  Created by Tomas Martins on 19/10/24.
-//
-
 import SwiftUI
 
 public struct ShinyButtonStyle: ButtonStyle {
@@ -17,7 +10,7 @@ public struct ShinyButtonStyle: ButtonStyle {
                         .drop(
                             color: .black.opacity(0.4),
                             radius: 0,
-                            y: -1
+                            y: configuration.isPressed ? 0 : -1
                         )
                     )
             )
@@ -56,10 +49,18 @@ public struct ShinyButtonStyle: ButtonStyle {
                         ],
                         startPoint: .top,
                         endPoint: .bottom
-                    ), lineWidth: 1)
+                    ), lineWidth: configuration.isPressed ? 2.5 : 1)
             }
             .compositingGroup()
-            .shadow(radius: 1, y: 2)
+            .shadow(color: .black.opacity(configuration.isPressed ? 0.0 : 0.5), radius:  1, y: 2)
+            .overlay {
+                if configuration.isPressed {
+                    Capsule().fill(.black).opacity(0.1)
+                }
+            }
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .animation(.smooth(duration: 0.2), value: configuration.isPressed)
+        
     }
 }
 
