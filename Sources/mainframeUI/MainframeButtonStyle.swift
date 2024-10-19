@@ -1,5 +1,5 @@
 //
-//  ShinyButtonStyle.swift
+//  MainframeButtonStyle.swift
 //  mainframeUI
 //
 //  Created by Tomas Martins on 19/10/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct ShinyButtonStyle: ButtonStyle {
+public struct MainframeButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundStyle(labelForegroundStyle)
@@ -92,9 +92,9 @@ public struct ShinyButtonStyle: ButtonStyle {
     }
 }
 
-extension ButtonStyle where Self == ShinyButtonStyle {
-    public static var shiny: ShinyButtonStyle {
-        ShinyButtonStyle()
+extension ButtonStyle where Self == MainframeButtonStyle {
+    public static var mainframe: MainframeButtonStyle {
+        MainframeButtonStyle()
     }
 }
 
@@ -108,7 +108,7 @@ extension ButtonStyle where Self == ShinyButtonStyle {
             Text("Generate")
                 .padding(.horizontal)
         }
-        .buttonStyle(.shiny)
+        .buttonStyle(.mainframe)
         .foregroundStyle(.gray.gradient)
     }
 }
