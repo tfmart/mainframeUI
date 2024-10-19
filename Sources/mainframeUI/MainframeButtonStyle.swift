@@ -36,10 +36,11 @@ public struct MainframeButtonStyle: ButtonStyle {
             .background(
                 ZStack {
                     Capsule()
-                        .fill(.foreground)
+                        .fill(.tint)
                         .fill(borderGradient)
                     Capsule()
-                        .fill(.foreground)
+                        .fill(.tint)
+                        .fill(.linearGradient(colors: [.clear, .black.opacity(0.2)], startPoint: .top, endPoint: .bottom))
                         .scaleEffect(innerCapsuleScaleEffect)
                 }
             )
@@ -95,10 +96,10 @@ extension ButtonStyle where Self == MainframeButtonStyle {
         Button {
             
         } label: {
-            Text("Primary")
+            Text("Start")
                 .padding(.horizontal)
         }
         .buttonStyle(.mainframe)
-        .foregroundStyle(.gray.gradient)
+        .tint(.red)
     }
 }
