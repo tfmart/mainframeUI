@@ -2,7 +2,7 @@
 
 ![Demonstration of the button and toggle style included in this package](hero.png)
 
-A sleek button and toggle style for SwiftUI. Inspired by ![designs shared by Jordan Singer](https://x.com/jsngr/status/1847316062557110777) (![@jsngr](https://x.com/jsngr)) for Mainframe.
+A sleek button and toggle style for SwiftUI. Inspired by [designs shared by Jordan Singer](https://x.com/jsngr/status/1847316062557110777) ([@jsngr](https://x.com/jsngr)) for Mainframe.
 
 # Usage
 ```swift
