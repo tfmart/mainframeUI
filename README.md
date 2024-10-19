@@ -1,6 +1,7 @@
 # mainframeUI
 
 A sleek button and toggle style for SwiftUI. Inspired by designs shared by Jordan Singer (@jsngr) for Mainframe.
+![Demonstration of the button and toggle style included in this package](hero.png)
 
 # Usage
 ```swift
@@ -8,6 +9,7 @@ import mainframeUI
 
 Button("Start") { }
     .toggleStyle(.mainframe)
+    .tint(.gray)
 
 Toggle("Setting", isOn: $isOn)
     .toggleStyle(.mainframe)
