@@ -14,21 +14,17 @@ public struct MainframeButtonStyle: ButtonStyle {
             .fontWeight(.semibold)
             .padding()
             .background(
-                ZStack {
-                    Capsule()
-                        .fill(.foreground)
-                    Capsule()
-                        .fill(.foreground)
-                        .stroke(
-                            LinearGradient(
-                                colors: borderGradientColors(configuration.isPressed),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ),
-                            lineWidth: 4
-                        )
-                        .padding(2)
-                }
+                Capsule()
+                    .fill(.foreground)
+                    .stroke(
+                        LinearGradient(
+                            colors: borderGradientColors(configuration.isPressed),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 4
+                    )
+                    .padding(2)
             )
             .overlay {
                 shadowBorder(configuration.isPressed)
@@ -105,7 +101,7 @@ extension ButtonStyle where Self == MainframeButtonStyle {
         Button {
             
         } label: {
-            Text("Generate")
+            Text("Primary")
                 .padding(.horizontal)
         }
         .buttonStyle(.mainframe)
